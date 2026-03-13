@@ -1,2 +1,2 @@
-humanitarian-aid
+zkat-alawadhi
 المساعدات الانسانية
