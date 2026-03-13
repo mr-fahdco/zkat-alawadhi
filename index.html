@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>نظام المساعدات الإنسانية</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-5 text-right">
+    <div class="max-w-4xl mx-auto bg-white p-8 rounded-xl shadow-lg">
+        <h1 class="text-2xl font-bold text-blue-800 border-b pb-4 mb-6">نظام المساعدات - إدارة الكروت</h1>
+        
+        <form id="aidForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block font-bold">السنة</label>
+                <input type="text" id="year" value="2024" class="w-full border p-2 rounded shadow-sm">
+            </div>
+            <div>
+                <label class="block font-bold">اللجنة</label>
+                <input type="text" id="committee" placeholder="رقم اللجنة" class="w-full border p-2 rounded shadow-sm" required>
+            </div>
+            <div class="md:col-span-2">
+                <label class="block font-bold text-red-600">اسم المستفيد (إجباري)</label>
+                <input type="text" id="beneficiary" class="w-full border p-2 rounded border-red-300" required>
+            </div>
+            <div>
+                <label class="block font-bold">الوحدة</label>
+                <select id="unit" class="w-full border p-2 rounded">
+                    <option value="كيس">كيس</option>
+                    <option value="مبلغ">مبلغ</option>
+                </select>
+            </div>
+            <div>
+                <label class="block font-bold">الكمية</label>
+                <input type="number" id="qty" value="1" class="w-full border p-2 rounded">
+            </div>
+            <div>
+                <label class="block font-bold">رقم الهوية</label>
+                <input type="text" id="idNum" class="w-full border p-2 rounded" placeholder="منع التكرار">
+            </div>
+            <div>
+                <label class="block font-bold text-red-600">رقم الجوال</label>
+                <input type="text" id="phone" class="w-full border p-2 rounded border-red-300">
+            </div>
+            <button type="submit" class="md:col-span-2 bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition">إضافة وصرف كرت جديد</button>
+        </form>
+
+        <div id="status" class="mt-4 text-center font-bold"></div>
+
+        <div class="mt-8 border-t pt-6">
+            <h2 class="font-bold mb-4">آخر الكروت المستلمة:</h2>
+            <div id="results" class="space-y-2"></div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('aidForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const status = document.getElementById('status');
+            status.innerText = "جاري الحفظ...";
+            
+            const data = {
+                year: document.getElementById('year').value,
+                committee: document.getElementById('committee').value,
+                beneficiary_name: document.getElementById('beneficiary').value,
+                unit: document.getElementById('unit').value,
+                quantity: document.getElementById('qty').value,
+                id_number: document.getElementById('idNum').value,
+                phone_number: document.getElementById('phone').value
+            };
+
+            const res = await fetch('/api/save', {
+                method: 'POST',
+                body: JSON.stringify(data)
+            });
+            const result = await res.json();
+            
+            if (result.success) {
+                status.innerHTML = `<span class="text-green-600">تم النجاح! رقم الكرت: ${result.card}</span>`;
+                document.getElementById('aidForm').reset();
+            } else {
+                status.innerHTML = `<span class="text-red-600">خطأ: ${result.error}</span>`;
+            }
+        };
+    </script>
+</body>
+</html>
